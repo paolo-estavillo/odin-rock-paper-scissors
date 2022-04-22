@@ -42,12 +42,12 @@ function checkInput(playerSelection) {
     return index != -1;
 }
 
-function game() {
+/* function game() {
     let playerSelection = "", computerSelection = "", result = "";
     let playerPoints = 0, computerPoints = 0;
     let cancelled = false;
 
-    alert("Let's play Rock Paper Scissors!");
+    console.log("Let's play Rock Paper Scissors!");
 
     for (let i = 0; i < 5; ++i) {
         
@@ -72,18 +72,106 @@ function game() {
             // Draw. Do nothing
         }
 
-        alert(`${result}\nCurrent points:\nComputer: ${computerPoints}\nYou: ${playerPoints}`);
+        console.log(`${result}\nCurrent points:\nComputer: ${computerPoints}\nYou: ${playerPoints}`);
     }
 
     if (cancelled) {
-        alert("Game cancelled. :(");
+        console.log("Game cancelled. :(");
     } else if (playerPoints > computerPoints) {
-        alert("You won this game! :)");
+        console.log("You won this game! :)");
     } else if (computerPoints > playerPoints) {
-        alert("You lost this game. :(");
+        console.log("You lost this game. :(");
     } else {
-        alert("Draw match! :|");
+        console.log("Draw match! :|");
+    }
+}
+game(); */
+
+function updateHandDisplay(user, selection) {
+    let userHand = document.querySelector(user);
+
+    let userHandSelection = document.querySelector(`${user} .handSelection`);
+
+    if (userHandSelection === null) {
+        userHandSelection = document.createElement('div');
+        userHandSelection.classList.add('handSelection');
+        userHandSelection.textContent = selection;
+        userHand.appendChild(userHandSelection);
+    } else {
+        userHandSelection.textContent = selection;
     }
 }
 
-game();
+function updateUserScore(user) {
+    let userScore = document.querySelector(`.${user}Score .score`);
+    let newScore = Number(userScore.textContent) + 1;
+    userScore.textContent = `${newScore}`;
+}
+
+function updateScoreBoard(result) {
+    if (result.startsWith('You Win!')) {
+        // Update player's score
+        updateUserScore('player')
+    } else if (result.startsWith('You Lose!')) {
+        // Update computer's score
+        updateUserScore('computer');
+    }
+
+    // Update Round Number
+    let roundNumber = document.querySelector('#roundNumber');
+    let newRound = Number(roundNumber.textContent) + 1;
+    roundNumber.textContent = `${newRound}`;
+}
+
+function inputHandler(e) {
+
+    let playerSelection = this.textContent.toLowerCase();
+    let computerSelection = computerPlay();
+
+    // Update the player hand displayed
+    updateHandDisplay('.playerHand', playerSelection);
+
+    // Update the computer hand displayed
+    updateHandDisplay('.computerHand', computerSelection);
+
+    // Get the result of the round
+    let result = playRound(playerSelection, computerSelection);
+
+    // Update the scoreboard
+    updateScoreBoard(result);
+
+    // Check if the game is finished
+    let playerScore = document.querySelector('.playerScore .score');
+    let computerScore = document.querySelector('.computerScore .score');
+    playerScore = Number(playerScore.textContent);
+    computerScore = Number(computerScore.textContent);
+
+    if ((computerScore >= 5) ||(playerScore >= 5)) {
+        // game is finished
+        let box = document.querySelector('.box');
+        let boxFooter = document.createElement('div');
+        
+        if (computerScore >= 5) {
+            boxFooter.textContent = "You Lost!";
+        } else {
+            boxFooter.textContent = "You Won!";
+        }
+
+        boxFooter.style['text-align'] = 'center';
+        boxFooter.style['font-weight'] = 'bold';
+
+        box.appendChild(boxFooter);
+
+        let buttons = document.querySelectorAll('.buttons button');
+        buttons.forEach(button => {
+            button.disabled = true;
+        })
+    }
+}
+
+// console.log(document.querySelector('.roundWrapper').textContent);
+
+let buttons = document.querySelectorAll(".buttons button");
+buttons.forEach((button) => {
+    button.addEventListener("click", inputHandler);
+})
